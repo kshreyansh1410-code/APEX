@@ -1,6 +1,6 @@
 # APEX
 
-A mobile-first landing page for **apex.**, a premium Gen-Z hair care brand. The page is a
+A mobile-first landing page for **REVLUME**, a premium Gen-Z hair care brand. The page is a
 zero-cost validation portal: it collects email sign-ups for the private "Batch №1"
 pre-order waitlist. There is no cart and no payment flow anywhere on the page.
 
