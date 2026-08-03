@@ -1,0 +1,630 @@
+/* ============================================================
+   apex. — Batch №1 private waitlist
+   Deliberate single dark world: charcoal + deep emerald only.
+   The brand doesn't have a light mode — a light waitlist page
+   would undercut the premium-drop identity the brief calls for.
+   ============================================================ */
+
+:root {
+  --ink: #121212;
+  --ink-2: #1b1b1b;
+  --pine: #0d2a20;
+  --pine-2: #123528;
+  --signal: #00e6a0;
+  --signal-dim: #0a5c46;
+  --paper: #ffffff;
+  --bone: #e8e6de;
+  --fog: #8b948e;
+  --line: rgba(255, 255, 255, 0.12);
+  --shadow: rgba(0, 0, 0, 0.45);
+
+  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --edge: clamp(1.5rem, 6vw, 3.25rem);
+  --radius: 2px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--bone);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--signal);
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+/* subtle grain, sits above everything, ignores pointer events */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- top bar ---------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem var(--edge);
+  background: rgba(18, 18, 18, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  text-transform: lowercase;
+}
+
+.wordmark--sm {
+  font-size: 1.05rem;
+}
+
+.tm {
+  font-size: 0.55em;
+  vertical-align: super;
+}
+
+.topbar-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fog);
+}
+
+.no {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- panels ---------- */
+
+.panel {
+  padding: clamp(3.5rem, 14vw, 6rem) var(--edge) clamp(3rem, 10vw, 5rem);
+}
+
+.panel--ink {
+  background: var(--ink);
+}
+
+.panel--pine {
+  background: var(--pine);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--signal);
+  margin: 0 0 1.1rem;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+  color: var(--paper);
+  margin: 0 0 1.1rem;
+  text-wrap: balance;
+}
+
+.display--sm {
+  font-size: clamp(1.9rem, 8vw, 2.6rem);
+}
+
+.brandmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: lowercase;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  font-size: clamp(3.2rem, 17vw, 6rem);
+  color: var(--paper);
+  margin: 0 0 1.25rem;
+}
+
+.lede {
+  max-width: 34rem;
+  font-size: clamp(1rem, 4vw, 1.15rem);
+  color: var(--bone);
+  margin: 0 0 2rem;
+}
+
+.fineprint {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--fog);
+  margin: 0.9rem 0 0;
+}
+
+/* ---------- stamp badge ---------- */
+
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper);
+  border: 1px solid var(--signal);
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  transform: rotate(-4deg);
+}
+
+.stamp-div {
+  width: 1px;
+  height: 0.8em;
+  background: var(--signal);
+  opacity: 0.6;
+}
+
+.stamp--float {
+  position: absolute;
+  top: -0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  background: var(--ink);
+}
+
+/* ---------- bottle illustration ---------- */
+
+.bottle-rig {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(0.75rem, 4vw, 1.5rem);
+  margin: 1rem 0 2.25rem;
+  padding-top: 2rem;
+}
+
+.bottle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 18px 30px var(--shadow));
+}
+
+.bottle-cap {
+  width: 34%;
+  height: 0.9rem;
+  background: linear-gradient(180deg, #3a3a3a, #161616);
+  border-radius: 3px 3px 1px 1px;
+}
+
+.bottle-body {
+  position: relative;
+  width: clamp(3.4rem, 13vw, 4.4rem);
+  border-radius: 10px;
+  background: linear-gradient(155deg, #2a2a2a 0%, #141414 55%, #050505 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset -6px -8px 16px rgba(0, 230, 160, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.bottle-label {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--paper);
+  padding: 0.4rem 0.3rem;
+  line-height: 1.3;
+}
+
+.bottle--shampoo .bottle-body {
+  height: clamp(7rem, 26vw, 9.5rem);
+}
+
+.bottle--conditioner .bottle-body {
+  height: clamp(6.1rem, 22vw, 8.2rem);
+}
+
+.bottle--gel .bottle-body {
+  height: clamp(5.3rem, 19vw, 7rem);
+}
+
+/* ---------- barcode divider ---------- */
+
+.barcode {
+  height: 22px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ink) 0 2px,
+    transparent 2px 5px,
+    var(--ink) 5px 6px,
+    transparent 6px 11px,
+    var(--ink) 11px 14px,
+    transparent 14px 16px
+  );
+  background-color: var(--pine);
+}
+
+.barcode--pine {
+  background-color: var(--ink);
+}
+
+/* ---------- routine / product steps ---------- */
+
+.routine {
+  list-style: none;
+  margin: 0 0 2.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.routine > li {
+  display: flex;
+  gap: 1.1rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.routine > li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.routine-no {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--signal);
+  padding-top: 0.15rem;
+  flex: none;
+}
+
+.routine-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.routine h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--paper);
+  margin: 0;
+}
+
+.routine-price {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: var(--signal);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.routine p {
+  margin: 0.4rem 0 0;
+  color: var(--bone);
+  font-size: 0.95rem;
+  max-width: 30rem;
+}
+
+/* ---------- kit bonus box ---------- */
+
+.kit-box {
+  background: var(--pine-2);
+  border: 1px solid var(--signal-dim);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.5rem 1.65rem;
+}
+
+.kit-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fog);
+  margin: 0 0 0.6rem;
+}
+
+.kit-price {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--paper);
+  margin: 0 0 0.5rem;
+}
+
+.kit-price strong {
+  color: var(--signal);
+  font-weight: 800;
+}
+
+.kit-copy {
+  margin: 0 0 1rem;
+  color: var(--bone);
+  font-size: 0.9rem;
+}
+
+.kit-link {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--signal);
+  text-decoration: none;
+  border-bottom: 1px solid var(--signal-dim);
+  padding-bottom: 2px;
+}
+
+.kit-link:hover,
+.kit-link:focus-visible {
+  border-color: var(--signal);
+}
+
+/* ---------- CTA button ---------- */
+
+.cta {
+  --cta-bg: var(--signal);
+  --cta-fg: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--cta-bg);
+  color: var(--cta-fg);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  text-align: center;
+  padding: 1.05rem 1.5rem;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 0 0 0 rgba(0, 230, 160, 0);
+}
+
+.cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -8px rgba(0, 230, 160, 0.5);
+}
+
+.cta:focus-visible {
+  outline: 3px solid var(--paper);
+  outline-offset: 2px;
+}
+
+.cta--block {
+  display: flex;
+  width: 100%;
+}
+
+.cta--sticky {
+  width: 100%;
+  padding: 0.9rem 1.25rem;
+  font-size: 0.85rem;
+}
+
+/* ---------- waitlist form ---------- */
+
+.waitlist form {
+  max-width: 26rem;
+}
+
+.field-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fog);
+  margin-bottom: 0.5rem;
+}
+
+.field-row {
+  margin-bottom: 0.4rem;
+}
+
+.field-input {
+  width: 100%;
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 0.95rem 1rem;
+  border-radius: var(--radius);
+}
+
+.field-input::placeholder {
+  color: var(--fog);
+}
+
+.field-input:focus-visible {
+  outline: none;
+  border-color: var(--signal);
+  box-shadow: 0 0 0 3px rgba(0, 230, 160, 0.2);
+}
+
+.field-error {
+  color: #ff8b7a;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  margin: 0 0 1rem;
+}
+
+.signup .cta {
+  margin-top: 0.75rem;
+}
+
+.success {
+  max-width: 26rem;
+  border: 1px solid var(--signal-dim);
+  background: rgba(0, 230, 160, 0.06);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+.success-tag {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1.4rem;
+  color: var(--signal);
+  margin: 0 0 0.5rem;
+}
+
+.success-copy {
+  margin: 0 0 0.75rem;
+  color: var(--bone);
+}
+
+.success-code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--fog);
+  margin: 0;
+}
+
+/* ---------- footer ---------- */
+
+.footer {
+  padding-top: clamp(2.5rem, 8vw, 3.5rem);
+  padding-bottom: clamp(6rem, 16vw, 3rem);
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+
+.footer-legal {
+  color: var(--fog);
+  font-size: 0.85rem;
+  margin: 0.75rem 0 0.35rem;
+}
+
+.footer-lot {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--fog);
+  margin: 0;
+}
+
+/* ---------- sticky mobile CTA ---------- */
+
+.sticky-cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 0.85rem var(--edge) calc(0.85rem + env(safe-area-inset-bottom, 0px));
+  background: rgba(18, 18, 18, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+  transform: translateY(110%);
+  transition: transform 0.3s ease;
+}
+
+.sticky-cta.is-visible {
+  transform: translateY(0);
+}
+
+@media (min-width: 720px) {
+  .sticky-cta {
+    display: none;
+  }
+}
+
+/* ---------- scroll reveal ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cta,
+  .sticky-cta {
+    transition: none;
+  }
+}
+
+/* ---------- larger viewports ---------- */
+
+@media (min-width: 720px) {
+  .panel {
+    max-width: 44rem;
+    margin: 0 auto;
+  }
+
+  .hero {
+    max-width: 50rem;
+  }
+
+  .routine-head {
+    flex-wrap: nowrap;
+  }
+}
+
+@media (min-width: 1024px) {
+  .panel {
+    max-width: 52rem;
+  }
+
+  .hero {
+    max-width: 58rem;
+  }
+
+  .brandmark {
+    font-size: clamp(4rem, 9vw, 6.5rem);
+  }
+}
