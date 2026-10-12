@@ -147,3 +147,6 @@ __pycache__/
 *.py[cod]
 .venv/
 .pytest_cache/
+
+# Jarvis personal data (notes, tasks)
+agent/data/

@@ -1,7 +1,7 @@
 """Loads config.toml and the git-ignored .env file."""
 
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -28,9 +28,26 @@ class ModelConfig:
 
 
 @dataclass(frozen=True)
+class ToolsConfig:
+    data_dir: str = "data"
+    max_rounds: int = 8
+
+
+@dataclass(frozen=True)
+class DebugConfig:
+    fail_tools: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class Config:
     assistant: AssistantConfig
     model: ModelConfig
+    tools: ToolsConfig
+    debug: DebugConfig
+
+    @property
+    def data_dir(self) -> Path:
+        return AGENT_DIR / self.tools.data_dir
 
 
 def load_config(path: Path = DEFAULT_CONFIG_PATH) -> Config:
@@ -40,4 +57,6 @@ def load_config(path: Path = DEFAULT_CONFIG_PATH) -> Config:
     return Config(
         assistant=AssistantConfig(**data.get("assistant", {})),
         model=ModelConfig(**data.get("model", {})),
+        tools=ToolsConfig(**data.get("tools", {})),
+        debug=DebugConfig(**data.get("debug", {})),
     )

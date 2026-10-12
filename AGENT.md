@@ -43,7 +43,7 @@ Jarvis must get my explicit "yes", every time and for each action, before it:
 - deletes data (including notes, tasks, and memories),
 - changes a setting.
 
-Enforced by a hard confirmation gate in Tier 6. Tools are flagged safe or consequential starting in Tier 2.
+Enforced by a hard confirmation gate in Tier 6. Since Tier 2 every tool is flagged safe or consequential, and consequential tools (so far only `delete_task`) **refuse to run** until that gate exists.
 
 ## Proactivity
 
@@ -58,8 +58,8 @@ API keys live only in environment variables or a git-ignored `agent/.env` file (
 | Tier | What | Status |
 |---|---|---|
 | 0 | Interview + this spec | done |
-| 1 | Brain: streaming text conversation loop | built, waiting for your check |
-| 2 | Hands: tool registry + the three tools above | |
+| 1 | Brain: streaming text conversation loop | built; hand check pending (needs your API key) |
+| 2 | Hands: tool registry + the three tools above | built; hand check pending |
 | 3 | Ears and mouth: push-to-talk, Deepgram, ElevenLabs | |
 | 4 | Memory: durable, human-editable facts | |
 | 5 | Heartbeat: quiet-by-default proactive checks | |

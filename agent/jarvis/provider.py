@@ -35,6 +35,7 @@ class Provider(Protocol):
         self,
         system: str,
         messages: list[dict],
+        tools: list[dict] | None = None,
         on_text: Callable[[str], None] | None = None,
     ) -> Reply: ...
 
@@ -49,10 +50,23 @@ class ClaudeProvider:
             self._client = anthropic.Anthropic(timeout=self.config.timeout_seconds, max_retries=2)
         return self._client
 
-    def respond(self, system, messages, on_text=None) -> Reply:
+    def respond(self, system, messages, tools=None, on_text=None) -> Reply:
         extra = {}
         if self.config.fallbacks:
             extra = {"betas": [FALLBACK_BETA], "fallbacks": "default"}
+        if tools:
+            extra["tools"] = tools
+        # Tool inputs stream eagerly, so the SDK can hit JSON it can't parse at all.
+        # That raises ValueError mid-stream; re-issue the request a couple of times.
+        for attempt in range(3):
+            try:
+                return self._respond_once(system, messages, on_text, extra)
+            except ValueError:
+                if attempt == 2:
+                    raise ProviderError("The model kept producing a malformed tool call. Try rephrasing.") from None
+        raise AssertionError("unreachable")
+
+    def _respond_once(self, system, messages, on_text, extra) -> Reply:
         try:
             with self._get_client().beta.messages.stream(
                 model=self.config.name,

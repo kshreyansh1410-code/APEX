@@ -5,13 +5,15 @@ import sys
 from .config import load_config
 from .core import Agent
 from .provider import ClaudeProvider
+from .tools import build_registry
 
 HELP = "Commands: /reset (forget this conversation), /quit (or Ctrl-D)."
 
 
 def main() -> None:
     config = load_config()
-    agent = Agent(ClaudeProvider(config.model), config.assistant)
+    registry = build_registry(config.data_dir, frozenset(config.debug.fail_tools))
+    agent = Agent(ClaudeProvider(config.model), config.assistant, registry, config.tools.max_rounds)
     name = config.assistant.name
     tty = sys.stdout.isatty()
 
@@ -44,8 +46,22 @@ def main() -> None:
             sys.stdout.write(chunk)
             sys.stdout.flush()
 
+        def on_tool_start(tool: str, args: dict) -> None:
+            nonlocal started
+            shown = ", ".join(f"{k}={v!r}" for k, v in (args or {}).items())
+            prefix = "\r\033[K" if tty and not started else ("\n" if started else "")
+            sys.stdout.write(f"{prefix}  ↳ {tool}({shown})")
+            sys.stdout.flush()
+
+        def on_tool_end(tool: str, outcome) -> None:
+            nonlocal started
+            status = f"failed: {outcome.content}" if outcome.is_error else "ok"
+            sys.stdout.write(f" — {status}\n{name} › ")
+            sys.stdout.flush()
+            started = True
+
         try:
-            result = agent.handle_turn(user_text, on_text=on_text)
+            result = agent.handle_turn(user_text, on_text=on_text, on_tool_start=on_tool_start, on_tool_end=on_tool_end)
         except KeyboardInterrupt:
             print("\n(stopped — that turn was discarded)\n")
             continue

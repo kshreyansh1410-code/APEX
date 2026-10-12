@@ -17,7 +17,7 @@ class FakeProvider:
         self.calls: list[list[dict]] = []
         self.fail_on = fail_on
 
-    def respond(self, system, messages, on_text=None):
+    def respond(self, system, messages, tools=None, on_text=None):
         self.calls.append([dict(m) for m in messages])
         if self.fail_on == len(self.calls):
             raise ProviderError("network down")

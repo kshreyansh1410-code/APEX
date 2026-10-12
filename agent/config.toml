@@ -18,3 +18,14 @@ max_tokens = 16000
 timeout_seconds = 60
 # If the model declines a request, let the API retry it on a fallback model.
 fallbacks = true
+
+[tools]
+# Where notes and tasks are stored (relative to this folder). Plain JSON you can open and edit.
+data_dir = "data"
+# Maximum rounds of tool calls in one turn before Jarvis gives up instead of looping.
+max_rounds = 8
+
+[debug]
+# Tools listed here fail on purpose, to check that Jarvis explains failures instead of crashing.
+# Example: fail_tools = ["list_tasks"]
+fail_tools = []
