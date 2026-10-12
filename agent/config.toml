@@ -1,0 +1,20 @@
+# Jarvis configuration. Tune behavior here, not in code.
+# Secrets (API keys) do NOT go here — put them in .env (see .env.example).
+
+[assistant]
+name = "Jarvis"
+wake_phrase = "Hey Jarvis"
+purpose = "help me with my research and studies: learning, keeping track of what I'm working on, and finding things out"
+personality = "Warm, plain-spoken, and brief. Explain clearly, like a patient tutor. Say so when you don't know."
+
+[model]
+# Model id for the brain. Change it here to swap models.
+name = "claude-opus-5-5"
+# How hard the model thinks: low | medium | high | xhigh | max.
+# Lower is faster and cheaper; research questions benefit from medium or higher.
+effort = "medium"
+max_tokens = 16000
+# Seconds to wait on the API before giving up on a turn.
+timeout_seconds = 60
+# If the model declines a request, let the API retry it on a fallback model.
+fallbacks = true
