@@ -25,7 +25,7 @@ These become the first tools (Tier 2) and the first test cases.
 - **Language:** Python 3.11+, small and readable, no heavy framework. Lives in `agent/`, separate from the REVLUME landing page that also lives in this repo.
 - **Brain:** Claude via the official `anthropic` SDK, default model `claude-opus-5-5`. Set in `agent/config.toml` and kept behind a thin provider seam (`agent/jarvis/provider.py`) so it can be swapped.
 - **Speech-to-text:** Deepgram, behind its own seam (Tier 3).
-- **Text-to-speech:** ElevenLabs, behind its own seam (Tier 3). Voice: a calm, warm, mid-pitch voice. The voice ID lives in config.
+- **Text-to-speech:** ElevenLabs, behind its own seam (Tier 3). Voice: [`wDsJlOXPqcvIUKdLXjDs`](https://elevenlabs.io/voices/wDsJlOXPqcvIUKdLXjDs), my choice, stored as `elevenlabs_voice_id` in `agent/config.toml`.
 - **Where it runs:** laptop first. The background "heartbeat" loop (Tier 5) is kept separate so it can move to an always-on host without a rewrite.
 
 ## How I talk to it

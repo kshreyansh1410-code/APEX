@@ -29,3 +29,8 @@ max_rounds = 8
 # Tools listed here fail on purpose, to check that Jarvis explains failures instead of crashing.
 # Example: fail_tools = ["list_tasks"]
 fail_tools = []
+
+[voice]
+# Used from Tier 3 (voice). Voice IDs aren't secrets; API keys still go in .env.
+# Chosen voice: https://elevenlabs.io/voices/wDsJlOXPqcvIUKdLXjDs
+elevenlabs_voice_id = "wDsJlOXPqcvIUKdLXjDs"
