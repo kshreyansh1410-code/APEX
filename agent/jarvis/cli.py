@@ -1,8 +1,9 @@
 """Text interface. Kept forever: it's how every later tier gets debugged."""
 
+import argparse
 import sys
 
-from .config import load_config
+from .config import Config, load_config
 from .core import Agent
 from .provider import ClaudeProvider
 from .tools import build_registry
@@ -10,10 +11,36 @@ from .tools import build_registry
 HELP = "Commands: /reset (forget this conversation), /quit (or Ctrl-D)."
 
 
-def main() -> None:
-    config = load_config()
+def build_agent(config: Config) -> Agent:
+    """The one agent core, shared by the text and voice interfaces."""
     registry = build_registry(config.data_dir, frozenset(config.debug.fail_tools))
-    agent = Agent(ClaudeProvider(config.model), config.assistant, registry, config.tools.max_rounds)
+    return Agent(ClaudeProvider(config.model), config.assistant, registry, config.tools.max_rounds)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(prog="python -m jarvis")
+    parser.add_argument("--voice", action="store_true", help="talk with push-to-talk instead of typing")
+    parser.add_argument("--voice-check", action="store_true", help="test mic, speakers, Deepgram and ElevenLabs")
+    args = parser.parse_args()
+    config = load_config()
+
+    if args.voice or args.voice_check:
+        from .voice import VoiceError, build_session, voice_check
+
+        if args.voice_check:
+            sys.exit(0 if voice_check(config) else 1)
+        try:
+            session = build_session(build_agent(config), config)
+            session.run()
+        except VoiceError as e:
+            print(f"[{e}]\nText mode still works: python -m jarvis")
+            sys.exit(1)
+        return
+
+    run_text(build_agent(config), config)
+
+
+def run_text(agent: Agent, config: Config) -> None:
     name = config.assistant.name
     tty = sys.stdout.isatty()
 

@@ -31,7 +31,7 @@ These become the first tools (Tier 2) and the first test cases.
 ## How I talk to it
 
 1. **Typing** (Tier 1). This path stays forever for debugging.
-2. **Push-to-talk** (Tier 3): hold a key, speak, release.
+2. **Push-to-talk** (Tier 3): hold Space, speak, release (`python -m jarvis --voice`). Falls back to Enter-to-talk where the key can't be watched. Key and mode are in config.
 3. **"Hey Jarvis" open-mic wake word**: later, after everything else is solid. openWakeWord ships a pretrained `hey_jarvis` model we can use.
 
 ## Never without asking *(default list)*
@@ -60,7 +60,7 @@ API keys live only in environment variables or a git-ignored `agent/.env` file (
 | 0 | Interview + this spec | done |
 | 1 | Brain: streaming text conversation loop | built; hand check pending (needs your API key) |
 | 2 | Hands: tool registry + the three tools above | built; hand check pending |
-| 3 | Ears and mouth: push-to-talk, Deepgram, ElevenLabs | |
+| 3 | Ears and mouth: push-to-talk, Deepgram, ElevenLabs | built; needs a run on your laptop (mic and speakers) |
 | 4 | Memory: durable, human-editable facts | |
 | 5 | Heartbeat: quiet-by-default proactive checks | |
 | 6 | Rails: confirmation gate, injection defense, config, audit log, kill switch | |

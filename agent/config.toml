@@ -31,6 +31,17 @@ max_rounds = 8
 fail_tools = []
 
 [voice]
-# Used from Tier 3 (voice). Voice IDs aren't secrets; API keys still go in .env.
-# Chosen voice: https://elevenlabs.io/voices/wDsJlOXPqcvIUKdLXjDs
+# Voice mode: python -m jarvis --voice. API keys go in .env, not here.
+# "hold": hold ptt_key while speaking. "enter": press Enter to start, Enter to stop.
+ptt_mode = "hold"
+# A pynput key name ("space", "ctrl_r", "alt_r", "f8", ...) or a single character.
+ptt_key = "space"
+# Short beeps when the mic opens and closes.
+earcons = true
+# Speech-to-text (Deepgram)
+stt_model = "nova-3"
+language = "en"
+# Text-to-speech (ElevenLabs). Chosen voice: https://elevenlabs.io/voices/wDsJlOXPqcvIUKdLXjDs
 elevenlabs_voice_id = "wDsJlOXPqcvIUKdLXjDs"
+# Flash is ElevenLabs' lowest-latency model; latency is the whole voice experience.
+tts_model = "eleven_flash_v2_5"

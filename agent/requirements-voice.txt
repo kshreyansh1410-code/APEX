@@ -1,0 +1,5 @@
+-r requirements.txt
+# Microphone and speakers (bundles PortAudio on macOS/Windows; on Linux: sudo apt install libportaudio2)
+sounddevice>=0.5
+# Hold-to-talk key detection
+pynput>=1.7

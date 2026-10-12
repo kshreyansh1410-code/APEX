@@ -39,11 +39,23 @@ class DebugConfig:
 
 
 @dataclass(frozen=True)
+class VoiceConfig:
+    ptt_mode: str = "hold"
+    ptt_key: str = "space"
+    earcons: bool = True
+    stt_model: str = "nova-3"
+    language: str = "en"
+    elevenlabs_voice_id: str = ""
+    tts_model: str = "eleven_flash_v2_5"
+
+
+@dataclass(frozen=True)
 class Config:
     assistant: AssistantConfig
     model: ModelConfig
     tools: ToolsConfig
     debug: DebugConfig
+    voice: VoiceConfig
 
     @property
     def data_dir(self) -> Path:
@@ -59,4 +71,5 @@ def load_config(path: Path = DEFAULT_CONFIG_PATH) -> Config:
         model=ModelConfig(**data.get("model", {})),
         tools=ToolsConfig(**data.get("tools", {})),
         debug=DebugConfig(**data.get("debug", {})),
+        voice=VoiceConfig(**data.get("voice", {})),
     )
