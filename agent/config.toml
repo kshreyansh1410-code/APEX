@@ -25,6 +25,13 @@ data_dir = "data"
 # Maximum rounds of tool calls in one turn before Jarvis gives up instead of looping.
 max_rounds = 8
 
+[memory]
+# Long-term memory: a Markdown file in data_dir you can open and edit by hand.
+file = "memory.md"
+# Up to this many memories go into every conversation; past that, the most recently
+# updated ones do, and Jarvis searches the rest with its recall_memories tool.
+max_in_prompt = 60
+
 [debug]
 # Tools listed here fail on purpose, to check that Jarvis explains failures instead of crashing.
 # Example: fail_tools = ["list_tasks"]

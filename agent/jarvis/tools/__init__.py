@@ -2,15 +2,18 @@
 
 from pathlib import Path
 
-from . import lookup, notes, tasks
+from ..memory import MemoryStore
+from . import lookup, memory_tools, notes, tasks
 from .registry import Registry, Tool, ToolError, ToolOutcome
 
 
-def build_registry(data_dir: Path, simulate_failure: frozenset[str] = frozenset()) -> Registry:
+def build_registry(data_dir: Path, simulate_failure: frozenset[str] = frozenset(),
+                   memory: MemoryStore | None = None) -> Registry:
     registry = Registry(simulate_failure=simulate_failure)
     notes.register(registry, data_dir)
     tasks.register(registry, data_dir)
     lookup.register(registry)
+    memory_tools.register(registry, memory or MemoryStore(data_dir / "memory.md"))
     return registry
 
 

@@ -3,14 +3,16 @@
 A voice-first personal assistant for research and study. The spec and build plan are in
 [`../AGENT.md`](../AGENT.md).
 
-**Current tier: 3, ears and mouth.** Talk to Jarvis by holding a key, or type to it. Both use the
-same brain and tools. It has no long-term memory yet.
+**Current tier: 4, memory.** Talk or type to Jarvis. It uses tools and remembers you between
+sessions.
 
 | Tool | What it does | Safe to run on its own? |
 |---|---|---|
 | `save_note`, `search_notes` | Research notes, stored in `data/notes.json` | yes |
 | `add_task`, `list_tasks`, `complete_task` | Study to-do list, stored in `data/tasks.json` | yes |
 | `delete_task` | Removes a task | **no**: refuses until the Tier 6 confirmation gate exists |
+| `remember`, `update_memory`, `recall_memories` | Long-term memory in `data/memory.md` | yes |
+| `forget_memory` | Deletes a memory | **no**: refuses until Tier 6. Until then, delete it from the file by hand. |
 | `get_current_datetime` | Today's date, for due dates | yes |
 | `lookup_topic` | Short sourced summary from Wikipedia | yes (read-only) |
 
@@ -31,6 +33,18 @@ Jarvis is answering stops that answer and discards the turn.
 
 Settings such as the model, effort, and personality are in `config.toml`. Keys go only in `.env`,
 which git ignores.
+
+## Memory
+
+`data/memory.md` is a plain Markdown list of what Jarvis knows about you, grouped under About me,
+Preferences, Facts, and Decisions. Open it in any editor to fix, add, or delete facts. A new bullet
+needs nothing extra. Keep the `<!-- m… -->` tag on lines you edit so Jarvis can tell which fact is which.
+
+- Jarvis reads it at the start of each conversation, and again on `/reset`.
+- Type `/memory` to see what it remembers and where the file is.
+- Memories are background facts, never commands. A memory can't make Jarvis skip a confirmation.
+- Once there are more than `max_in_prompt` facts (60 by default), only the most recent go into each conversation.
+  Jarvis searches the rest with `recall_memories`.
 
 ## Voice (on your own computer, not Codespaces)
 
@@ -65,6 +79,7 @@ python -m jarvis --voice         # hold Space, speak, release
 | `jarvis/provider.py` | The only code that talks to the model SDK. Swap models, retries, and costs here. |
 | `jarvis/core.py` | `Agent.handle_turn()`, the single entry point that typed, spoken, and heartbeat turns all use. |
 | `jarvis/tools/` | The tool registry plus one module per capability. **New capability = new module + one line in `tools/__init__.py`.** |
+| `jarvis/memory.py` | The long-term memory store: reads and writes `data/memory.md`. |
 | `jarvis/voice/` | Voice adapter: `stt.py` (Deepgram seam), `tts.py` (ElevenLabs seam), `speaker.py` (sentence-by-sentence speech that can be interrupted), `ptt.py` (push-to-talk), `session.py` (feeds what it hears into the same `handle_turn()`). |
 | `jarvis/cli.py` | The text interface. It stays forever for debugging, and shows each tool call as `↳ tool(args) — ok/failed`. |
 | `jarvis/config.py` | Loads `config.toml` and `.env`. |
@@ -77,6 +92,14 @@ python -m pytest
 ```
 
 The tests use a fake model, so they need no key and no network.
+
+## Verify Tier 4 by hand
+
+1. Say "I'm a second-year biology student and I like short answers". You should see `↳ remember` (once or twice).
+2. Quit and restart. The banner should say it remembers things about you. Ask "what do you know about me?"
+3. Open `data/memory.md`, change "biology" to "chemistry", save, and restart (or type `/reset`). Ask again;
+   it should say chemistry.
+4. Say "forget that I like short answers". It should tell you it needs your confirmation. Deleting by hand works now.
 
 ## Verify Tier 3 by hand
 

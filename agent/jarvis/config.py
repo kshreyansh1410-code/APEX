@@ -34,6 +34,12 @@ class ToolsConfig:
 
 
 @dataclass(frozen=True)
+class MemoryConfig:
+    file: str = "memory.md"
+    max_in_prompt: int = 60
+
+
+@dataclass(frozen=True)
 class DebugConfig:
     fail_tools: list[str] = field(default_factory=list)
 
@@ -56,10 +62,15 @@ class Config:
     tools: ToolsConfig
     debug: DebugConfig
     voice: VoiceConfig
+    memory: MemoryConfig
 
     @property
     def data_dir(self) -> Path:
         return AGENT_DIR / self.tools.data_dir
+
+    @property
+    def memory_path(self) -> Path:
+        return self.data_dir / self.memory.file
 
 
 def load_config(path: Path = DEFAULT_CONFIG_PATH) -> Config:
@@ -72,4 +83,5 @@ def load_config(path: Path = DEFAULT_CONFIG_PATH) -> Config:
         tools=ToolsConfig(**data.get("tools", {})),
         debug=DebugConfig(**data.get("debug", {})),
         voice=VoiceConfig(**data.get("voice", {})),
+        memory=MemoryConfig(**data.get("memory", {})),
     )

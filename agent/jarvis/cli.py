@@ -5,16 +5,19 @@ import sys
 
 from .config import Config, load_config
 from .core import Agent
+from .memory import MemoryStore
 from .provider import ClaudeProvider
 from .tools import build_registry
 
-HELP = "Commands: /reset (forget this conversation), /quit (or Ctrl-D)."
+HELP = "Commands: /memory (what I remember), /reset (new conversation), /quit (or Ctrl-D)."
 
 
 def build_agent(config: Config) -> Agent:
     """The one agent core, shared by the text and voice interfaces."""
-    registry = build_registry(config.data_dir, frozenset(config.debug.fail_tools))
-    return Agent(ClaudeProvider(config.model), config.assistant, registry, config.tools.max_rounds)
+    memory = MemoryStore(config.memory_path)
+    registry = build_registry(config.data_dir, frozenset(config.debug.fail_tools), memory)
+    return Agent(ClaudeProvider(config.model), config.assistant, registry, config.tools.max_rounds,
+                 memory=memory, max_memories_in_prompt=config.memory.max_in_prompt)
 
 
 def main() -> None:
@@ -44,7 +47,9 @@ def run_text(agent: Agent, config: Config) -> None:
     name = config.assistant.name
     tty = sys.stdout.isatty()
 
-    print(f"{name} is ready. {HELP}\n")
+    remembered = len(agent.memory.load()) if agent.memory else 0
+    known = f" I remember {remembered} thing{'s' if remembered != 1 else ''} about you." if remembered else ""
+    print(f"{name} is ready.{known} {HELP}\n")
     while True:
         try:
             user_text = input("you › ").strip()
@@ -57,7 +62,10 @@ def run_text(agent: Agent, config: Config) -> None:
             break
         if user_text == "/reset":
             agent.reset()
-            print(f"{name} › Fresh start. I've forgotten this conversation.\n")
+            print(f"{name} › Fresh start. I've forgotten this conversation (but not my long-term memory).\n")
+            continue
+        if user_text == "/memory":
+            show_memory(agent, config)
             continue
 
         # Show a sign of life right away, then replace it with the streamed reply.
@@ -107,6 +115,14 @@ def run_text(agent: Agent, config: Config) -> None:
             print("\n")
 
     print(f"{name} › Bye.")
+
+
+def show_memory(agent: Agent, config: Config) -> None:
+    memories = agent.memory.load() if agent.memory else []
+    print(f"Long-term memory ({len(memories)}) — edit by hand at {config.memory_path}")
+    for m in memories:
+        print(f"  {m.line()}")
+    print("Hand edits take effect on /reset or the next start.\n")
 
 
 if __name__ == "__main__":

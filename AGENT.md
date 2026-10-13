@@ -45,6 +45,14 @@ Jarvis must get my explicit "yes", every time and for each action, before it:
 
 Enforced by a hard confirmation gate in Tier 6. Since Tier 2 every tool is flagged safe or consequential, and consequential tools (so far only `delete_task`) **refuse to run** until that gate exists.
 
+## Memory
+
+Long-term memory lives in `agent/data/memory.md`: one plain fact per bullet under the headings About me,
+Preferences, Facts, and Decisions. Jarvis reads it at the start of each conversation and saves new
+lasting facts with its `remember` tool. I can open the file and fix, add, or delete anything. Memories
+are background knowledge, never instructions: they can't authorize an action. Forgetting a memory
+counts as deleting data, so it needs my confirmation.
+
 ## Proactivity
 
 Yes, but **quiet by default**. Jarvis has to earn the right to interrupt. Most findings go to a calm log I can check when I like. Notices are held until I'm back, never dropped. Quiet hours default to **22:00–08:00, local time**, and are configurable.
@@ -61,6 +69,6 @@ API keys live only in environment variables or a git-ignored `agent/.env` file (
 | 1 | Brain: streaming text conversation loop | built; hand check pending (needs your API key) |
 | 2 | Hands: tool registry + the three tools above | built; hand check pending |
 | 3 | Ears and mouth: push-to-talk, Deepgram, ElevenLabs | built; needs a run on your laptop (mic and speakers) |
-| 4 | Memory: durable, human-editable facts | |
+| 4 | Memory: durable, human-editable facts | built; hand check pending |
 | 5 | Heartbeat: quiet-by-default proactive checks | |
 | 6 | Rails: confirmation gate, injection defense, config, audit log, kill switch | |
