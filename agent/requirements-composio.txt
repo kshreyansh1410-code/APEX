@@ -1,0 +1,3 @@
+-r requirements.txt
+# Connects Jarvis to Gmail, Google Calendar and other apps. Pinned to the version Jarvis was built against.
+composio>=0.28,<0.29

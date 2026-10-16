@@ -157,9 +157,9 @@ def test_consequential_tools_never_run_without_approval(registry):
     assert refused.is_error and "confirmation" in refused.content
     assert "Old task" in registry.run("list_tasks", {"which": "open"}).content
 
-    registry.approver = lambda tool, args: False
+    registry.approver = lambda tool, args, description: False
     assert registry.run("delete_task", {"task_id": 1}).is_error
-    registry.approver = lambda tool, args: True
+    registry.approver = lambda tool, args, description: True
     assert not registry.run("delete_task", {"task_id": 1}).is_error
     assert registry.run("list_tasks", {"which": "open"}).content == "No open tasks."
 

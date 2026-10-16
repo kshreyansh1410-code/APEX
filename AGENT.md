@@ -26,6 +26,7 @@ These become the first tools (Tier 2) and the first test cases.
 - **Brain:** Claude via the official `anthropic` SDK, default model `claude-opus-5-5`. Set in `agent/config.toml` and kept behind a thin provider seam (`agent/jarvis/provider.py`) so it can be swapped.
 - **Speech-to-text:** Deepgram, behind its own seam (Tier 3).
 - **Text-to-speech:** ElevenLabs, behind its own seam (Tier 3). Voice: [`wDsJlOXPqcvIUKdLXjDs`](https://elevenlabs.io/voices/wDsJlOXPqcvIUKdLXjDs), my choice, stored as `elevenlabs_voice_id` in `agent/config.toml`.
+- **Apps:** Composio (Gmail, Google Calendar to start), behind the same tool registry and confirmation gate.
 - **Where it runs:** laptop first. The background "heartbeat" loop (Tier 5) is kept separate so it can move to an always-on host without a rewrite.
 
 ## How I talk to it
@@ -43,7 +44,18 @@ Jarvis must get my explicit "yes", every time and for each action, before it:
 - deletes data (including notes, tasks, and memories),
 - changes a setting.
 
-Enforced by a hard confirmation gate in Tier 6. Since Tier 2 every tool is flagged safe or consequential, and consequential tools (so far only `delete_task`) **refuse to run** until that gate exists.
+Enforced by a hard confirmation gate in the tool registry, built ahead of the rest of Tier 6 so apps could be
+connected safely. Before any consequential call, Jarvis says plainly what it's about to do and waits for my yes:
+`y` when typing, or a spoken "yes" in voice mode. Anything unclear, no answer within 30 seconds, or nobody there
+to ask means **no**. Every action asks on its own; one yes never covers the next.
+
+## Connected apps (Composio)
+
+Jarvis reaches my apps through [Composio](https://composio.dev), with `COMPOSIO_API_KEY` in `agent/.env`.
+It starts with **Gmail and Google Calendar** (my choice can change in `config.toml`). A Composio tool
+runs without asking only when Composio marks it read-only; sending, creating, editing, and deleting always go
+through the confirmation gate. Anything an app returns (email text, event details) is labelled outside data,
+and Jarvis is told never to follow instructions found in it.
 
 ## Memory
 
@@ -59,7 +71,7 @@ Yes, but **quiet by default**. Jarvis has to earn the right to interrupt. Most f
 
 ## Secrets
 
-API keys live only in environment variables or a git-ignored `agent/.env` file (`ANTHROPIC_API_KEY`, `DEEPGRAM_API_KEY`, `ELEVENLABS_API_KEY`). They never go in source files or chat.
+API keys live only in environment variables or a git-ignored `agent/.env` file (`ANTHROPIC_API_KEY`, `DEEPGRAM_API_KEY`, `ELEVENLABS_API_KEY`, `COMPOSIO_API_KEY`). They never go in source files or chat.
 
 ## Build plan
 
@@ -71,4 +83,5 @@ API keys live only in environment variables or a git-ignored `agent/.env` file (
 | 3 | Ears and mouth: push-to-talk, Deepgram, ElevenLabs | built; needs a run on your laptop (mic and speakers) |
 | 4 | Memory: durable, human-editable facts | built; hand check pending |
 | 5 | Heartbeat: quiet-by-default proactive checks | |
-| 6 | Rails: confirmation gate, injection defense, config, audit log, kill switch | |
+| + | Apps via Composio (Gmail, Calendar) | built; needs your Composio key and a `--connect` |
+| 6 | Rails: confirmation gate, injection defense, config, audit log, kill switch | gate and injection framing built early; audit log, cost tally, kill switch to come |

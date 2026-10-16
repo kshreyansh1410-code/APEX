@@ -32,6 +32,28 @@ file = "memory.md"
 # updated ones do, and Jarvis searches the rest with its recall_memories tool.
 max_in_prompt = 60
 
+[composio]
+# Connects Jarvis to your apps through Composio (needs COMPOSIO_API_KEY in .env).
+# Connect an app once with: python -m jarvis --connect gmail
+enabled = true
+user_id = "jarvis-user"
+toolkits = ["gmail", "googlecalendar"]
+# Tools taken from each toolkit. Every tool costs prompt space, so keep this modest.
+tools_per_toolkit = 10
+# Exact tool slugs to add as well, e.g. ["GMAIL_SEND_EMAIL"].
+tools = []
+# Composio tools run without asking only when Composio marks them read-only.
+# List slugs here only if you're sure they're safe to run without asking.
+no_confirm = []
+max_result_chars = 15000
+
+[safety]
+# Anything that sends, spends, deletes, or changes a setting always asks first, every time.
+# List more tool names here to make them ask too, e.g. confirm_tools = ["save_note"].
+confirm_tools = []
+# Voice mode: seconds to wait for a spoken yes/no before treating it as "no".
+confirm_timeout_seconds = 30
+
 [debug]
 # Tools listed here fail on purpose, to check that Jarvis explains failures instead of crashing.
 # Example: fail_tools = ["list_tasks"]

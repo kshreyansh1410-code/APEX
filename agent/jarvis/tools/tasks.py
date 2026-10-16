@@ -20,6 +20,13 @@ def _line(t: dict) -> str:
     return f"#{t['id']}: {t['title']}{due}{done}"
 
 
+def _describe_delete(store: JsonStore, task_id: int) -> str:
+    for t in store.load():
+        if t["id"] == task_id:
+            return f"permanently delete task #{task_id}: \"{t['title']}\""
+    return f"delete task #{task_id} (it doesn't seem to exist)"
+
+
 def register(registry: Registry, data_dir: Path) -> None:
     store = JsonStore(data_dir / "tasks.json")
 
@@ -131,6 +138,7 @@ def register(registry: Registry, data_dir: Path) -> None:
         },
         handler=delete_task,
         consequential=True,  # deletes data
+        describe=lambda args: _describe_delete(store, args["task_id"]),
     ))
     registry.register(Tool(
         name="get_current_datetime",

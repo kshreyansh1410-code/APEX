@@ -44,7 +44,8 @@ def build_session(agent: Agent, config: Config) -> VoiceSession:
     else:
         raise VoiceError(f"ptt_mode must be 'hold' or 'enter', not '{voice.ptt_mode}'.")
     return VoiceSession(agent, transcriber, speaker, Recorder(), ptt, events,
-                        play_earcon=player.play if voice.earcons else None)
+                        play_earcon=player.play if voice.earcons else None,
+                        confirm_timeout=config.safety.confirm_timeout_seconds)
 
 
 def voice_check(config: Config) -> bool:

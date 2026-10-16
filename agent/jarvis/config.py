@@ -6,6 +6,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from .tools.composio_tools import ComposioConfig
+
 AGENT_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_CONFIG_PATH = AGENT_DIR / "config.toml"
 
@@ -40,6 +42,14 @@ class MemoryConfig:
 
 
 @dataclass(frozen=True)
+class SafetyConfig:
+    # Tools that must be confirmed even though they're normally safe to run alone.
+    confirm_tools: list[str] = field(default_factory=list)
+    # How long to wait for a spoken yes/no before treating it as no.
+    confirm_timeout_seconds: float = 30
+
+
+@dataclass(frozen=True)
 class DebugConfig:
     fail_tools: list[str] = field(default_factory=list)
 
@@ -63,6 +73,8 @@ class Config:
     debug: DebugConfig
     voice: VoiceConfig
     memory: MemoryConfig
+    safety: SafetyConfig
+    composio: ComposioConfig
 
     @property
     def data_dir(self) -> Path:
@@ -84,4 +96,6 @@ def load_config(path: Path = DEFAULT_CONFIG_PATH) -> Config:
         debug=DebugConfig(**data.get("debug", {})),
         voice=VoiceConfig(**data.get("voice", {})),
         memory=MemoryConfig(**data.get("memory", {})),
+        safety=SafetyConfig(**data.get("safety", {})),
+        composio=ComposioConfig(**data.get("composio", {})),
     )

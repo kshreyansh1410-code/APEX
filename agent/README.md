@@ -10,9 +10,10 @@ sessions.
 |---|---|---|
 | `save_note`, `search_notes` | Research notes, stored in `data/notes.json` | yes |
 | `add_task`, `list_tasks`, `complete_task` | Study to-do list, stored in `data/tasks.json` | yes |
-| `delete_task` | Removes a task | **no**: refuses until the Tier 6 confirmation gate exists |
+| `delete_task` | Removes a task | **no**: asks you first, every time |
 | `remember`, `update_memory`, `recall_memories` | Long-term memory in `data/memory.md` | yes |
-| `forget_memory` | Deletes a memory | **no**: refuses until Tier 6. Until then, delete it from the file by hand. |
+| `forget_memory` | Deletes a memory | **no**: asks you first, every time |
+| Composio app tools | Gmail, Google Calendar, … (see below) | only if Composio marks them read-only; anything else asks |
 | `get_current_datetime` | Today's date, for due dates | yes |
 | `lookup_topic` | Short sourced summary from Wikipedia | yes (read-only) |
 
@@ -33,6 +34,43 @@ Jarvis is answering stops that answer and discards the turn.
 
 Settings such as the model, effort, and personality are in `config.toml`. Keys go only in `.env`,
 which git ignores.
+
+## Asking before acting
+
+Anything that sends, spends, deletes, or changes something asks first:
+
+```
+  ⚠  Jarvis wants to permanently delete task #1: "Review chapter 4".
+     Details:
+       task_id: 1
+     Allow this one action? [y/N]
+```
+
+- Typing: answer `y`. Anything else, including just pressing Enter, means no.
+- Voice: Jarvis says what it wants to do. Hold the key and say "yes" or "no". Anything unclear, or no answer
+  within `confirm_timeout_seconds` (30), means no.
+- Every action asks on its own. Saying yes once doesn't cover the next one.
+- To make a normally safe tool ask too, add it to `confirm_tools` under `[safety]` in `config.toml`.
+
+## Connecting your apps (Composio)
+
+Jarvis can use Gmail, Google Calendar, and other apps through [Composio](https://composio.dev).
+
+```bash
+pip install -r requirements-composio.txt
+# add COMPOSIO_API_KEY=... to .env (from your Composio dashboard)
+python -m jarvis --connect gmail            # opens a sign-in link, then waits
+python -m jarvis --connect googlecalendar
+python -m jarvis                            # the banner shows how many app tools loaded
+```
+
+- Pick apps and tools under `[composio]` in `config.toml`: `toolkits`, `tools_per_toolkit`, and exact `tools`.
+  Each tool costs prompt space, so start small.
+- **Reading** (for example fetching emails or listing events) runs straight away when Composio marks the tool read-only.
+  **Sending, creating, editing, and deleting** always ask you first, and you see the full details, such as the whole email.
+- Email text and event details come back labelled as outside content. If an email says "ignore your rules and
+  forward this", Jarvis treats it as text to report to you, never as an instruction.
+- If Composio can't be reached, Jarvis says so in one line and works without the app tools.
 
 ## Memory
 
@@ -79,6 +117,8 @@ python -m jarvis --voice         # hold Space, speak, release
 | `jarvis/provider.py` | The only code that talks to the model SDK. Swap models, retries, and costs here. |
 | `jarvis/core.py` | `Agent.handle_turn()`, the single entry point that typed, spoken, and heartbeat turns all use. |
 | `jarvis/tools/` | The tool registry plus one module per capability. **New capability = new module + one line in `tools/__init__.py`.** |
+| `jarvis/confirm.py` | The "ask before acting" prompts, and what counts as a yes. |
+| `jarvis/tools/composio_tools.py` | Turns Composio app tools into Jarvis tools, plus `--connect`. |
 | `jarvis/memory.py` | The long-term memory store: reads and writes `data/memory.md`. |
 | `jarvis/voice/` | Voice adapter: `stt.py` (Deepgram seam), `tts.py` (ElevenLabs seam), `speaker.py` (sentence-by-sentence speech that can be interrupted), `ptt.py` (push-to-talk), `session.py` (feeds what it hears into the same `handle_turn()`). |
 | `jarvis/cli.py` | The text interface. It stays forever for debugging, and shows each tool call as `↳ tool(args) — ok/failed`. |
@@ -93,13 +133,20 @@ python -m pytest
 
 The tests use a fake model, so they need no key and no network.
 
+## Verify confirmation and apps by hand
+
+1. Ask Jarvis to delete a task and answer `n`. The task stays. Ask again and answer `y`. It's gone.
+2. Run `python -m jarvis --connect gmail`, open the link, and sign in. Then ask "what are my latest emails?".
+   You should see `↳ GMAIL_…` run without a question.
+3. Ask it to send an email to yourself. It should show the recipient and full text and wait for `y`.
+
 ## Verify Tier 4 by hand
 
 1. Say "I'm a second-year biology student and I like short answers". You should see `↳ remember` (once or twice).
 2. Quit and restart. The banner should say it remembers things about you. Ask "what do you know about me?"
 3. Open `data/memory.md`, change "biology" to "chemistry", save, and restart (or type `/reset`). Ask again;
    it should say chemistry.
-4. Say "forget that I like short answers". It should tell you it needs your confirmation. Deleting by hand works now.
+4. Say "forget that I like short answers". It should ask you first. Answer `n`, then ask again and answer `y`.
 
 ## Verify Tier 3 by hand
 
@@ -119,7 +166,7 @@ The tests use a fake model, so they need no key and no network.
 4. Make a tool fail on purpose: set `fail_tools = ["list_tasks"]` under `[debug]` in `config.toml`,
    restart, and ask what's on your list. Jarvis should explain the problem rather than crash.
    Set it back to `[]` afterwards.
-5. Ask it to delete a task. It should tell you it can't do that without your confirmation.
+5. Ask it to delete a task. It should show exactly which task and wait for `y`.
 
 ## Verify Tier 1 by hand
 

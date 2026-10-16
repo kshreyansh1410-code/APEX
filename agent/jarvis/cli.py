@@ -3,11 +3,12 @@
 import argparse
 import sys
 
+from .confirm import text_approver
 from .config import Config, load_config
 from .core import Agent
 from .memory import MemoryStore
 from .provider import ClaudeProvider
-from .tools import build_registry
+from .tools import build_registry, composio_tools
 
 HELP = "Commands: /memory (what I remember), /reset (new conversation), /quit (or Ctrl-D)."
 
@@ -16,6 +17,10 @@ def build_agent(config: Config) -> Agent:
     """The one agent core, shared by the text and voice interfaces."""
     memory = MemoryStore(config.memory_path)
     registry = build_registry(config.data_dir, frozenset(config.debug.fail_tools), memory)
+    registry.extra_confirm = frozenset(config.safety.confirm_tools)
+    status = composio_tools.load(registry, config.composio)
+    if status:
+        print(status)
     return Agent(ClaudeProvider(config.model), config.assistant, registry, config.tools.max_rounds,
                  memory=memory, max_memories_in_prompt=config.memory.max_in_prompt)
 
@@ -24,8 +29,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="python -m jarvis")
     parser.add_argument("--voice", action="store_true", help="talk with push-to-talk instead of typing")
     parser.add_argument("--voice-check", action="store_true", help="test mic, speakers, Deepgram and ElevenLabs")
+    parser.add_argument("--connect", metavar="APP", help="connect an app through Composio, e.g. gmail or googlecalendar")
     args = parser.parse_args()
     config = load_config()
+
+    if args.connect:
+        sys.exit(0 if composio_tools.connect(args.connect, config.composio) else 1)
 
     if args.voice or args.voice_check:
         from .voice import VoiceError, build_session, voice_check
@@ -40,7 +49,9 @@ def main() -> None:
             sys.exit(1)
         return
 
-    run_text(build_agent(config), config)
+    agent = build_agent(config)
+    agent.registry.approver = text_approver()
+    run_text(agent, config)
 
 
 def run_text(agent: Agent, config: Config) -> None:

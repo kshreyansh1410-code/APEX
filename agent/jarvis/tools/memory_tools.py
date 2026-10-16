@@ -4,6 +4,13 @@ from ..memory import CATEGORIES, MemoryError, MemoryStore
 from .registry import Registry, Tool, ToolError
 
 
+def _describe_forget(store: MemoryStore, memory_id: int) -> str:
+    for m in store.load():
+        if m.id == memory_id:
+            return f"permanently forget memory #{memory_id}: \"{m.text}\""
+    return f"forget memory #{memory_id} (it doesn't seem to exist)"
+
+
 def register(registry: Registry, store: MemoryStore) -> None:
     def remember(fact: str, category: str) -> str:
         memory, created = store.add(fact, category)
@@ -80,6 +87,7 @@ def register(registry: Registry, store: MemoryStore) -> None:
         },
         handler=forget_memory,
         consequential=True,  # deletes data
+        describe=lambda args: _describe_forget(store, args["memory_id"]),
     ))
     registry.register(Tool(
         name="recall_memories",
